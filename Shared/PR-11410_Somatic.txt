@@ -1,4 +1,5 @@
- $java_bin_dir/bin/java -Djava.io.tmpdir=<PATH> -Xmx24576m \
+## applying bqsr
+$java_bin_dir/bin/java -Djava.io.tmpdir=<PATH> -Xmx24576m \
  	-jar <PATH>/GenomeAnalysisTK/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar \
  	-T PrintReads \
  	-nct 4 \
@@ -10,7 +11,7 @@
  	-o $Sample_dir/analysis/FXX.recalibrated.bam \
  	-BQSR $Sample_dir/qc/FXX.recal.grp
 
- 
+## calculating gc bias metrics on final bam 
 <PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m -XX:ParallelGCThreads=4 \
 	-jar <PATH>/picard-tools/picard-tools-1.83/CollectGcBiasMetrics.jar \
 	ASSUME_SORTED=true \
@@ -21,8 +22,8 @@
 	CHART_OUTPUT=$Sample_dir/qc/FXX.GcBiasMetrics.gc_bias.pdf \
 	SUMMARY_OUTPUT=$Sample_dir/qc/FXX.GcBiasMetrics.gc_bias_summary
 
- 
- <PATH>/java -Djava.io.tmpdir=<PATH> -Xmx73728m \
+## Doing indel realignment 
+<PATH>/java -Djava.io.tmpdir=<PATH> -Xmx73728m \
  	-jar <PATH>/GenomeAnalysisTK/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar \
  	-T IndelRealigner \
  	-rf BadCigar \
@@ -36,7 +37,7 @@
  	-nWayOut $Sample_dir/analysis/for_realigner.joint.map
 
  
-
+## generating covariates for bqsr
 <PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m \
 	-jar <PATH>/GenomeAnalysisTK/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar \
 	-T BaseRecalibrator \
@@ -51,8 +52,8 @@
 	-knownSites <PATH>/Mus_musculus/GRCm38.70/mgp.v3.indels.clean.vcf.gz
 
  
-
- <PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m \
+## generating covariates for bqsr
+<PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m \
  	-jar <PATH>/GenomeAnalysisTK/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar 
  	-T BaseRecalibrator \
  	--interval_padding 200 \
@@ -66,8 +67,21 @@
  	-knownSites <PATH>/Mus_musculus/GRCm38.70/mgp.v3.indels.clean.vcf.gz
 
  
+## applying bqsr
+<PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m \
+ 	-jar <PATH>/GenomeAnalysisTK/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar \
+ 	-T PrintReads \
+ 	-nct 4 \
+ 	-rf BadCigar \
+ 	--disable_indel_quals \
+ 	--emit_original_quals \
+ 	-R <PATH>/Mus_musculus/GRCm38.70/Mus_musculus.GRCm38.70.dna.fasta \
+ 	-I $Sample_dir/analysis/FXX.dedup.joint.realigned.bam \
+ 	-o $Sample_dir/analysis/FXX.recalibrated.bam \
+ 	-BQSR $Sample_dir/qc/FXX.recal.grp
 
- <PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m \
+## applying bqsr 
+<PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m \
  	-jar <PATH>/GenomeAnalysisTK/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar \
  	-T PrintReads \
  	-nct 4 \
@@ -80,21 +94,8 @@
  	-BQSR $Sample_dir/qc/FXX.recal.grp
 
  
- <PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m \
- 	-jar <PATH>/GenomeAnalysisTK/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar \
- 	-T PrintReads \
- 	-nct 4 \
- 	-rf BadCigar \
- 	--disable_indel_quals \
- 	--emit_original_quals \
- 	-R <PATH>/Mus_musculus/GRCm38.70/Mus_musculus.GRCm38.70.dna.fasta \
- 	-I $Sample_dir/analysis/FXX.dedup.joint.realigned.bam \
- 	-o $Sample_dir/analysis/FXX.recalibrated.bam \
- 	-BQSR $Sample_dir/qc/FXX.recal.grp
-
- 
-
- <PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m -XX:ParallelGCThreads=4 \
+## calculating qc metrics
+<PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m -XX:ParallelGCThreads=4 \
  	-jar <PATH>/picard-tools/picard-tools-1.83/CollectMultipleMetrics.jar \
  	PROGRAM=CollectAlignmentSummaryMetrics \
  	PROGRAM=MeanQualityByCycle \
@@ -106,7 +107,7 @@
  	OUTPUT=$Sample_dir/qc/FXX.MultipleMetrics
 
  
-
+## generating covariates for bqsr
 <PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m \
 	-jar <PATH>/GenomeAnalysisTK/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar \
 	-T BaseRecalibrator \
@@ -121,7 +122,7 @@
 	-knownSites <PATH>/Mus_musculus/GRCm38.70/mgp.v3.indels.clean.vcf.gz
 
  
-
+## getting coverage distribution
 <PATH>/samtools/samtools-0.1.18/samtools view  \
 	-F 1024 -q 1 -b $Sample_dir/analysis/FXX.final.bam | \
 	<PATH>/bedtools/bedtools-2.17.0/bin/genomeCoverageBed \
@@ -129,8 +130,8 @@
 	> $Sample_dir/qc/FXX.BedTools.coverage
 
  
-
- <PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m \
+## getting flag metrics
+<PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m \
  	-jar <PATH>/GenomeAnalysisTK/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar \
  	-T FlagStat \
  	-l INFO \
@@ -139,7 +140,7 @@
  	-o $Sample_dir/qc/FXX.FlagStat.txt
 
  
-
+## getting read counts of non ref bases in exons
 cut -f1,2 <PATH>/Concordance/SureSelect_Mouse_All_Exon_V1_GRCm38_markers_MAF_0.4_LD_0.8.txt > \
 	$Sample_dir/concordance/mpileup/marker_file_positions.txt \ 
 	set -o pipefail && \
@@ -154,7 +155,7 @@ cut -f1,2 <PATH>/Concordance/SureSelect_Mouse_All_Exon_V1_GRCm38_markers_MAF_0.4
 rm $Sample_dir/concordance/mpileup/marker_file_positions.txt
 
  
-
+## calculating gc bias metrics on final bam 
 <PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m -XX:ParallelGCThreads=4 \
 	-jar <PATH>/picard-tools/picard-tools-1.83/CollectGcBiasMetrics.jar \
 	ASSUME_SORTED=true \
@@ -166,8 +167,8 @@ rm $Sample_dir/concordance/mpileup/marker_file_positions.txt
 	SUMMARY_OUTPUT=$Sample_dir/qc/FXX.GcBiasMetrics.gc_bias_summary
 
  
-
- <PATH>/samtools/samtools-0.1.18/samtools view  \
+## calculating coverage
+<PATH>/samtools/samtools-0.1.18/samtools view  \
  	-F 1024 -q 1 \
  	-b $Sample_dir/analysis/FXX.final.bam | \
  	<PATH>/bedtools/bedtools-2.17.0/bin/genomeCoverageBed \
@@ -176,12 +177,11 @@ rm $Sample_dir/concordance/mpileup/marker_file_positions.txt
  	$Sample_dir/qc/FXX.BedTools.coverage
 
  
-
-cut -f1,2 \
-	<PATH>/Concordance/SureSelect_Mouse_All_Exon_V1_GRCm38_markers_MAF_0.4_LD_0.8.txt > \
+## getting read counts of non ref bases in exons
+cut -f1,2 <PATH>/Concordance/SureSelect_Mouse_All_Exon_V1_GRCm38_markers_MAF_0.4_LD_0.8.txt > \
 	$Sample_dir/concordance/mpileup/marker_file_positions.txt \
-	set -o pipefail && <PATH>/samtools/samtools-1.1/samtools \
-	mpileup \
+	set -o pipefail && \
+	<PATH>/samtools/samtools-1.1/samtools mpileup \
 	-q 20 -Q 20 -t DP --ff DUP \
 	-Iugvf <PATH>/Mus_musculus/GRCm38.70/Mus_musculus.GRCm38.70.dna.fasta \
 	-l $Sample_dir/concordance/mpileup/marker_file_positions.txt $Sample_dir/analysis/FXX.final.bam | \
@@ -191,15 +191,16 @@ cut -f1,2 \
 rm $Sample_dir/concordance/mpileup/marker_file_positions.txt
 
  
-
+## getting chr y cov
 /bin/grep -e "^Y" $Sample_dir/qc/FXX.BedTools.coverage | \
 	/bin/cut -f2- > $Sample_dir/qc/FXX.BedTools.chrY.coverage
 
+# getting autosome cov
 /bin/grep -e "^genome" $Sample_dir/qc/FXX.BedTools.coverage | \
 	/bin/cut -f2- > $Sample_dir/qc/FXX.BedTools.genome.coverage
 
  
-
+## calculating gc bias metrics on final bam 
 <PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m -XX:ParallelGCThreads=4 \
 	-jar <PATH>/picard-tools/picard-tools-1.83/CollectGcBiasMetrics.jar \
 	ASSUME_SORTED=true \
@@ -211,7 +212,7 @@ rm $Sample_dir/concordance/mpileup/marker_file_positions.txt
 	SUMMARY_OUTPUT=$Sample_dir/qc/FXX.GcBiasMetrics.gc_bias_summary
 
  
-
+## getting flag metrics
 <PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m \
 	-jar <PATH>/GenomeAnalysisTK/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar \
 	-T FlagStat \
@@ -221,7 +222,7 @@ rm $Sample_dir/concordance/mpileup/marker_file_positions.txt
 	-o $Sample_dir/qc/FXX.FlagStat.txt
 
  
-
+## calculating metrics
 <PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m -XX:ParallelGCThreads=4 \
 	-jar <PATH>/picard-tools/picard-tools-1.83/CollectMultipleMetrics.jar \
 	PROGRAM=CollectAlignmentSummaryMetrics \
@@ -234,7 +235,7 @@ rm $Sample_dir/concordance/mpileup/marker_file_positions.txt
 	OUTPUT=$Sample_dir/qc/FXX.MultipleMetrics
 
  
-
+## calculating metrics
 <PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m -XX:ParallelGCThreads=4 \
 	-jar <PATH>/picard-tools/picard-tools-1.83/CollectMultipleMetrics.jar \
 	PROGRAM=CollectAlignmentSummaryMetrics \
@@ -247,7 +248,7 @@ rm $Sample_dir/concordance/mpileup/marker_file_positions.txt
 	OUTPUT=$Sample_dir/qc/FXX.MultipleMetrics
 
  
-
+## calculating metrics
 <PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m -XX:ParallelGCThreads=4 \
 	-jar <PATH>/picard-tools/picard-tools-1.119/CollectWgsMetrics.jar \
 	VALIDATION_STRINGENCY=SILENT \
@@ -256,7 +257,7 @@ rm $Sample_dir/concordance/mpileup/marker_file_positions.txt
 	OUTPUT=$Sample_dir/qc/FXX.CollectWgsMetrics.txt
 
  
-
+## calculating metrics
 <PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m -XX:ParallelGCThreads=4 \
 	-jar <PATH>/picard-tools/picard-tools-1.119/CollectWgsMetrics.jar \
 	VALIDATION_STRINGENCY=SILENT \
@@ -265,7 +266,7 @@ rm $Sample_dir/concordance/mpileup/marker_file_positions.txt
 	OUTPUT=$Sample_dir/qc/FXX.CollectWgsMetrics.txt
 
  
-
+## running haplotype caller ....
 <PATH>/java -XX:ParallelGCThreads=2 -Djava.io.tmpdir=<PATH> -Xmx65536M \
 	-jar <PATH>/GenomeAnalysisTK/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar \
 	-T HaplotypeCaller \
@@ -295,7 +296,7 @@ rm $Sample_dir/concordance/mpileup/marker_file_positions.txt
 	-I $Sample_dir/analysis/FXX.final.bam \
 	-o $Sample_dir/analysis/FXX.haplotypeCalls.er.raw.vcf
 
- 
+## generating intervals for realignment
 <PATH>/java -Djava.io.tmpdir=<PATH> -Xmx73728m \
 	-jar <PATH>/GenomeAnalysisTK/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar \
 	-T RealignerTargetCreator \
@@ -309,13 +310,11 @@ rm $Sample_dir/concordance/mpileup/marker_file_positions.txt
 	-o $Sample_dir/analysis/FXX.for_realigner.joint.intervals
 
  
-
- 
-
-cut -f1,2 \
-	<PATH>/Concordance/SureSelect_Mouse_All_Exon_V1_GRCm38_markers_MAF_0.4_LD_0.8.txt > \
+## getting read counts of non ref bases in exons
+cut -f1,2 <PATH>/Concordance/SureSelect_Mouse_All_Exon_V1_GRCm38_markers_MAF_0.4_LD_0.8.txt > \
 	$Sample_dir/concordance/mpileup/marker_file_positions.txt \
-	set -o pipefail && <PATH>/samtools/samtools-1.1/samtools mpileup \
+	set -o pipefail && \
+	<PATH>/samtools/samtools-1.1/samtools mpileup \
 	-q 20 \
 	-Q 20 \
 	-t DP \
@@ -329,7 +328,7 @@ cut -f1,2 \
 rm $Sample_dir/concordance/mpileup/marker_file_positions.txt
 
 
-
+## getting flagstats
 <PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m \
 	-jar <PATH>/GenomeAnalysisTK/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar \
 	-T FlagStat \
@@ -338,6 +337,7 @@ rm $Sample_dir/concordance/mpileup/marker_file_positions.txt
 	-I $Sample_dir/analysis/FXX.final.bam \
 	-o $Sample_dir/qc/FXX.FlagStat.txt
 
+## getting metrics
 <PATH>/java/jre1.7.0_25/bin/java -Djava.io.tmpdir=<PATH> -Xmx24576m -XX:ParallelGCThreads=4 \
 	-jar <PATH>/picard-tools/picard-tools-1.119/CollectWgsMetrics.jar \
 	VALIDATION_STRINGENCY=SILENT \
@@ -346,15 +346,15 @@ rm $Sample_dir/concordance/mpileup/marker_file_positions.txt
 	OUTPUT=$Sample_dir/qc/FXX.CollectWgsMetrics.txt
 
  
-
+## y chr coverage
 /bin/grep -e "^Y" $Sample_dir/qc/FXX.BedTools.coverage | \
 	/bin/cut -f2- > $Sample_dir/qc/FXX.BedTools.chrY.coverage
 
-
+## autosome coverage
 /bin/grep -e "^genome" $Sample_dir/qc/FXX.BedTools.coverage | \
 	/bin/cut -f2- > $Sample_dir/qc/FXX.BedTools.genome.coverage
 
-
+## genome wide coverage
 <PATH>/samtools/samtools-0.1.18/samtools view  \
 	-F 1024 \
 	-q 1 \
@@ -365,15 +365,16 @@ rm $Sample_dir/concordance/mpileup/marker_file_positions.txt
 	$Sample_dir/qc/FXX.BedTools.coverage
 
 
-
+## y chr coverage
 /bin/grep -e "^Y" $Sample_dir/qc/FXX.BedTools.coverage | \
 	/bin/cut -f2- > $Sample_dir/qc/FXX.BedTools.chrY.coverage
 
+## autosome coverage
 /bin/grep -e "^genome" $Sample_dir/qc/FXX.BedTools.coverage | \
 	/bin/cut -f2- > $Sample_dir/qc/FXX.BedTools.genome.coverage
 
  
-
+## mark duplicates
 <PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m -XX:ParallelGCThreads=5 \
 	-jar <PATH>/picard-tools/picard-tools-1.83/MarkDuplicates.jar \
 	CREATE_INDEX=true \
@@ -384,7 +385,7 @@ rm $Sample_dir/concordance/mpileup/marker_file_positions.txt
 	O=$Sample_dir/analysis/FXX.dedup.bam
 
  
-
+## merge bams across lanes
 <PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m -XX:ParallelGCThreads=4 \
 	-jar <PATH>/picard-tools/picard-tools-1.83/MergeSamFiles.jar \
 	USE_THREADING=true \
@@ -396,7 +397,7 @@ rm $Sample_dir/concordance/mpileup/marker_file_positions.txt
 	OUTPUT=$Sample_dir/analysis/FXX.merged.bam
 
  
-
+## merge bams across lanes
 /d$java_bin_dir/bin/java -Djava.io.tmpdir=<PATH> -Xmx24576m -XX:ParallelGCThreads=4 \
 	-jar <PATH>/picard-tools/picard-tools-1.83/MergeSamFiles.jar \
 	USE_THREADING=true \
@@ -413,7 +414,7 @@ rm $Sample_dir/concordance/mpileup/marker_file_positions.txt
 	OUTPUT=$Sample_dir/analysis/FXX.merged.bam
 
  
-
+## merge bams across lanes
 <PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m -XX:ParallelGCThreads=4 \
 	-jar <PATH>/picard-tools/picard-tools-1.83/MergeSamFiles.jar \
 	USE_THREADING=true \
@@ -428,7 +429,7 @@ rm $Sample_dir/concordance/mpileup/marker_file_positions.txt
 	OUTPUT=$Sample_dir/analysis/FXX.merged.bam
 
  
-
+## mark duplicates
 <PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m -XX:ParallelGCThreads=5 \
 	-jar <PATH>/picard-tools/picard-tools-1.83/MarkDuplicates.jar \
 	CREATE_INDEX=true \
@@ -439,7 +440,7 @@ rm $Sample_dir/concordance/mpileup/marker_file_positions.txt
 	O=$Sample_dir/analysis/FXX.dedup.bam
 
  
-
+## mark duplicates
 <PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m -XX:ParallelGCThreads=5 \
 	-jar <PATH>/picard-tools/picard-tools-1.83/MarkDuplicates.jar \
 	CREATE_INDEX=true \

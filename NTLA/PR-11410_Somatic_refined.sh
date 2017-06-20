@@ -1,4 +1,23 @@
-## STEP 1: Mark Duplicates
+## STEP 1: adding RG info
+<PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m -XX:ParallelGCThreads=4 \
+	-jar <PATH>/picard-tools/picard-tools-1.83/AddOrReplaceReadGroups.jar \
+	MAX_RECORDS_IN_RAM=2000000 \
+	CREATE_INDEX=true \
+	SORT_ORDER=coordinate \
+	VALIDATION_STRINGENCY=SILENT \
+	I=$bam_dir/FXX_ATTCAGAA-AGGCGAAG_BC6RMGANXX_L001_001.aln.sampe.bam \
+	O=$bam_dir/FXX_ATTCAGAA-AGGCGAAG_BC6RMGANXX_L001_001.aln.bam \
+	RGID=FXX_ATTCAGAA-AGGCGAAG_BC6RMGANXX_L001_001 \
+	RGLB=FXX \
+	RGSM=FXX \
+	RGPU="C6RMGANXX.1.ATTCAGAA-AGGCGAAG" \
+	RGCN="NYGenome" \
+	RGDS="RefVersion:GRCm38.70-Sequencer:HiSeq-2500(HiSeq-v4)" \
+	RGPL="illumina"
+
+
+
+## STEP 2: Mark Duplicates
 ## *merged.bam is after merging across lanes, already done when downloading from SRA
 ## Do this on one sample at a time
 <PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m -XX:ParallelGCThreads=5 \
@@ -12,7 +31,7 @@
 
 
 
-## STEP 2: Realignment Target Creator
+## STEP 3: Realignment Target Creator
 ## Doing this on all samples at once
 <PATH>/java -Djava.io.tmpdir=<PATH> -Xmx73728m \
 	-jar <PATH>/GenomeAnalysisTK/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar \
@@ -28,7 +47,7 @@
 
 
 
-## STEP 3: Indel Realignment
+## STEP 4: Indel Realignment
 ## Doing this on all samples at once
 ## will need to generate this file -nWayOut $Sample_dir/analysis/for_realigner.joint.map
 <PATH>/java -Djava.io.tmpdir=<PATH> -Xmx73728m \
@@ -46,7 +65,7 @@
 
 
 
-## STEP 4: Generatinng BQSR Covariates
+## STEP 5: Generatinng BQSR Covariates
 ## use known site vcfs
 <PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m \
 	-jar <PATH>/GenomeAnalysisTK/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar \
@@ -63,7 +82,7 @@
 
 
 
-## STEP 5: Applying BQSR Adjustments
+## STEP 6: Applying BQSR Adjustments
 $java_bin_dir/bin/java -Djava.io.tmpdir=<PATH> -Xmx24576m \
  	-jar <PATH>/GenomeAnalysisTK/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar \
  	-T PrintReads \

@@ -1,3 +1,5 @@
+
+
 ## STEP 1: adding RG info
 java -Xmx24576m -XX:ParallelGCThreads=4 \
 	-jar ~/Downloads/picard-tools-1.83/AddOrReplaceReadGroups.jar \
@@ -5,8 +7,8 @@ java -Xmx24576m -XX:ParallelGCThreads=4 \
 	CREATE_INDEX=true \
 	SORT_ORDER=coordinate \
 	VALIDATION_STRINGENCY=SILENT \
-	I=$bam_dir/FXX_ATTCAGAA-AGGCGAAG_BC6RMGANXX_L001_001.aln.sampe.bam \
-	O=$bam_dir/FXX_ATTCAGAA-AGGCGAAG_BC6RMGANXX_L001_001.aln.bam \
+	I=~/Documents/OT/Align/FXX_ATTCAGAA-AGGCGAAG_BC6RMGANXX_L001_001.aln.sampe.bam \
+	O=~/Documents/OT/Align/FXX_ATTCAGAA-AGGCGAAG_BC6RMGANXX_L001_001.aln.bam \
 	RGID=FXX_ATTCAGAA-AGGCGAAG_BC6RMGANXX_L001_001 \
 	RGLB=FXX \
 	RGSM=FXX \
@@ -25,9 +27,9 @@ java -Xmx24576m -XX:ParallelGCThreads=5 \
 	CREATE_INDEX=true \
 	MAX_RECORDS_IN_RAM=2000000 \
 	VALIDATION_STRINGENCY=SILENT \
-	M=$Sample_dir/qc/FXX.dedup.metrics \
-	I=$Sample_dir/analysis/FXX.merged.bam \
-	O=$Sample_dir/analysis/FXX.dedup.bam
+	M=~/Documents/OT/Align/FXX.dedup.metrics \
+	I=~/Documents/OT/Align/FXX.merged.bam \
+	O=~/Documents/OT/Align/FXX.dedup.bam
 
 
 
@@ -40,10 +42,10 @@ java -Xmx73728m \
 	-rf BadCigar \
 	-nt 24 \
 	-R <PATH>/Mus_musculus/GRCm38.70/Mus_musculus.GRCm38.70.dna.fasta \
-	-I $Sample_dir/analysis/FXX.dedup.bam \
-	-I $Sample_dir/analysis/FXX.dedup.bam \
-	-I $Sample_dir/analysis/FXX.dedup.bam \
-	-o $Sample_dir/analysis/FXX.for_realigner.joint.intervals
+	-I ~/Documents/OT/Align/FXX.dedup.bam \
+	-I ~/Documents/OT/Align/FXX.dedup.bam \
+	-I ~/Documents/OT/Align/FXX.dedup.bam \
+	-o ~/Documents/OT/Align/FXX.for_realigner.joint.intervals
 
 
 
@@ -57,11 +59,11 @@ java -Xmx73728m \
  	--consensusDeterminationModel USE_READS \
  	-dcov 1000 \
  	-R <PATH>/Mus_musculus/GRCm38.70/Mus_musculus.GRCm38.70.dna.fasta \
- 	-I $Sample_dir/analysis/FXX.dedup.bam \
- 	-I $Sample_dir/analysis/FXX.dedup.bam \
- 	-I $Sample_dir/analysis/FXX.dedup.bam \
- 	-targetIntervals $Sample_dir/analysis/FXX.for_realigner.joint.intervals \
- 	-nWayOut $Sample_dir/analysis/for_realigner.joint.map
+ 	-I ~/Documents/OT/Align/FXX.dedup.bam \
+ 	-I ~/Documents/OT/Align/FXX.dedup.bam \
+ 	-I ~/Documents/OT/Align/FXX.dedup.bam \
+ 	-targetIntervals ~/Documents/OT/Align/FXX.for_realigner.joint.intervals \
+ 	-nWayOut ~/Documents/OT/Align/for_realigner.joint.map
 
 
 
@@ -75,8 +77,8 @@ java -Xmx24576m \
 	-rf BadCigar \
 	-nct 4 \
 	-R <PATH>/Mus_musculus/GRCm38.70/Mus_musculus.GRCm38.70.dna.fasta \
-	-I $Sample_dir/analysis/FXX.dedup.joint.realigned.bam \
-	-o $Sample_dir/qc/FXX.recal.grp \
+	-I ~/Documents/OT/Align/FXX.dedup.joint.realigned.bam \
+	-o ~/Documents/OT/Align/FXX.recal.grp \
 	-knownSites <PATH>/Mus_musculus/GRCm38.70/dbSNP_v138.vcf.gz \
 	-knownSites <PATH>/Mus_musculus/GRCm38.70/mgp.v3.indels.clean.vcf.gz
 
@@ -91,9 +93,9 @@ java -Xmx24576m \
  	--disable_indel_quals \
  	--emit_original_quals \
  	-R <PATH>/Resources/Mus_musculus/GRCm38.70/Mus_musculus.GRCm38.70.dna.fasta \
- 	-I $Sample_dir/analysis/FXX.dedup.joint.realigned.bam \
- 	-o $Sample_dir/analysis/FXX.recalibrated.bam \
- 	-BQSR $Sample_dir/qc/FXX.recal.grp
+ 	-I ~/Documents/OT/Align/FXX.dedup.joint.realigned.bam \
+ 	-o ~/Documents/OT/Align/FXX.recalibrated.bam \
+ 	-BQSR ~/Documents/OT/Align/FXX.recal.grp
 
 
 ## ????? 

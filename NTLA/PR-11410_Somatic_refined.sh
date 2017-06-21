@@ -1,6 +1,6 @@
 ## STEP 1: adding RG info
-<PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m -XX:ParallelGCThreads=4 \
-	-jar <PATH>/picard-tools/picard-tools-1.83/AddOrReplaceReadGroups.jar \
+java -Xmx24576m -XX:ParallelGCThreads=4 \
+	-jar ~/Downloads/picard-tools-1.83/AddOrReplaceReadGroups.jar \
 	MAX_RECORDS_IN_RAM=2000000 \
 	CREATE_INDEX=true \
 	SORT_ORDER=coordinate \
@@ -20,8 +20,8 @@
 ## STEP 2: Mark Duplicates
 ## *merged.bam is after merging across lanes, already done when downloading from SRA
 ## Do this on one sample at a time
-<PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m -XX:ParallelGCThreads=5 \
-	-jar <PATH>/picard-tools/picard-tools-1.83/MarkDuplicates.jar \
+java -Xmx24576m -XX:ParallelGCThreads=5 \
+	-jar ~/Downloads/picard-tools-1.83/AddOrReplaceReadGroups.jar \
 	CREATE_INDEX=true \
 	MAX_RECORDS_IN_RAM=2000000 \
 	VALIDATION_STRINGENCY=SILENT \
@@ -33,8 +33,8 @@
 
 ## STEP 3: Realignment Target Creator
 ## Doing this on all samples at once
-<PATH>/java -Djava.io.tmpdir=<PATH> -Xmx73728m \
-	-jar <PATH>/GenomeAnalysisTK/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar \
+java -Xmx73728m \
+	-jar ~/Downloads/GenomeAnalysisTK.jar \
 	-T RealignerTargetCreator \
 	--interval_padding 200 \
 	-rf BadCigar \
@@ -50,7 +50,7 @@
 ## STEP 4: Indel Realignment
 ## Doing this on all samples at once
 ## will need to generate this file -nWayOut $Sample_dir/analysis/for_realigner.joint.map
-<PATH>/java -Djava.io.tmpdir=<PATH> -Xmx73728m \
+java -Xmx73728m \
  	-jar <PATH>/GenomeAnalysisTK/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar \
  	-T IndelRealigner \
  	-rf BadCigar \
@@ -67,7 +67,7 @@
 
 ## STEP 5: Generatinng BQSR Covariates
 ## use known site vcfs
-<PATH>/java -Djava.io.tmpdir=<PATH> -Xmx24576m \
+java -Xmx24576m \
 	-jar <PATH>/GenomeAnalysisTK/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar \
 	-T BaseRecalibrator \
 	--interval_padding 200 \
@@ -83,7 +83,7 @@
 
 
 ## STEP 6: Applying BQSR Adjustments
-$java_bin_dir/bin/java -Djava.io.tmpdir=<PATH> -Xmx24576m \
+java -Xmx24576m \
  	-jar <PATH>/GenomeAnalysisTK/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar \
  	-T PrintReads \
  	-nct 4 \

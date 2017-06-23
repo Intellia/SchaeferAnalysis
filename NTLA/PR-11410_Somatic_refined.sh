@@ -1,17 +1,15 @@
-
-
 ## STEP 1: adding RG info
-java -Xmx24576m -XX:ParallelGCThreads=4 \
+java -Xmx24576m -XX:ParallelGCThreads=24 \
 	-jar ~/Downloads/picard-tools-1.83/AddOrReplaceReadGroups.jar \
 	MAX_RECORDS_IN_RAM=2000000 \
 	CREATE_INDEX=true \
 	SORT_ORDER=coordinate \
 	VALIDATION_STRINGENCY=SILENT \
-	I=~/Documents/OT/Align/FXX_ATTCAGAA-AGGCGAAG_BC6RMGANXX_L001_001.aln.sampe.bam \
-	O=~/Documents/OT/Align/FXX_ATTCAGAA-AGGCGAAG_BC6RMGANXX_L001_001.aln.bam \
-	RGID=FXX_ATTCAGAA-AGGCGAAG_BC6RMGANXX_L001_001 \
-	RGLB=FXX \
-	RGSM=FXX \
+	I=~/Documents/OT/Align/F03.bam \
+	O=~/Documents/OT/Align/F03.rg.bam \
+	RGID=F03 \
+	RGLB=F03 \
+	RGSM=F03 \
 	RGPU="C6RMGANXX.1.ATTCAGAA-AGGCGAAG" \
 	RGCN="NYGenome" \
 	RGDS="RefVersion:GRCm38.70-Sequencer:HiSeq-2500(HiSeq-v4)" \
@@ -22,14 +20,14 @@ java -Xmx24576m -XX:ParallelGCThreads=4 \
 ## STEP 2: Mark Duplicates
 ## *merged.bam is after merging across lanes, already done when downloading from SRA
 ## Do this on one sample at a time
-java -Xmx24576m -XX:ParallelGCThreads=5 \
-	-jar ~/Downloads/picard-tools-1.83/AddOrReplaceReadGroups.jar \
+java -Xmx24576m -XX:ParallelGCThreads=24 \
+	-jar ~/Downloads/picard-tools-1.83/MarkDuplicates.jar \
 	CREATE_INDEX=true \
 	MAX_RECORDS_IN_RAM=2000000 \
 	VALIDATION_STRINGENCY=SILENT \
-	M=~/Documents/OT/Align/FXX.dedup.metrics \
-	I=~/Documents/OT/Align/FXX.merged.bam \
-	O=~/Documents/OT/Align/FXX.dedup.bam
+	M=~/OT/Align/Control.dedup.metrics \
+	I=~/OT/Align/Control.rg.bam \
+	O=~/OT/Align/Control.dedup.bam
 
 
 
@@ -53,7 +51,7 @@ java -Xmx73728m \
 ## Doing this on all samples at once
 ## will need to generate this file -nWayOut $Sample_dir/analysis/for_realigner.joint.map
 java -Xmx73728m \
- 	-jar <PATH>/GenomeAnalysisTK/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar \
+ 	-jar ~/Downloads/GenomeAnalysisTK.jar \
  	-T IndelRealigner \
  	-rf BadCigar \
  	--consensusDeterminationModel USE_READS \
@@ -70,7 +68,7 @@ java -Xmx73728m \
 ## STEP 5: Generatinng BQSR Covariates
 ## use known site vcfs
 java -Xmx24576m \
-	-jar <PATH>/GenomeAnalysisTK/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar \
+	-jar ~/Downloads/GenomeAnalysisTK.jar \
 	-T BaseRecalibrator \
 	--interval_padding 200 \
 	--downsample_to_fraction 0.1 \
@@ -86,7 +84,7 @@ java -Xmx24576m \
 
 ## STEP 6: Applying BQSR Adjustments
 java -Xmx24576m \
- 	-jar <PATH>/GenomeAnalysisTK/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar \
+ 	-jar ~/Downloads/GenomeAnalysisTK.jar \
  	-T PrintReads \
  	-nct 4 \
  	-rf BadCigar \

@@ -2,7 +2,7 @@
 # Makefile.  Generated from Makefile.in by configure.
 #
 
-INSTALL_DIR := /usr/local
+INSTALL_DIR := /home/ubuntu/Documents/Github/SchaeferAnalysis/Caller/strelka_workflow-1.0.15
 
 export INSTALL_DIR
 

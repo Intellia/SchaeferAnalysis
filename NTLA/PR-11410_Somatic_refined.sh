@@ -25,9 +25,9 @@ java -Xmx24576m -XX:ParallelGCThreads=24 \
 	CREATE_INDEX=true \
 	MAX_RECORDS_IN_RAM=2000000 \
 	VALIDATION_STRINGENCY=SILENT \
-	M=~/OT/Align/Control.dedup.metrics \
-	I=~/OT/Align/Control.rg.bam \
-	O=~/OT/Align/Control.dedup.bam
+	M=~/Documents/OT/Align/F05.dedup.metrics \
+	I=~/Documents/OT/Align/F05.rg.bam  \
+	O=~/Documents/OT/Align/F05.dedup.bam 
 
 
 
